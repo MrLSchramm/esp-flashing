@@ -1,17 +1,17 @@
 from flask import Flask, request
 
 app = Flask(__name__)
-current_message = "Hello World!"
+message = "Waiting..."
 
 @app.route('/')
-def get_message():
-    return current_message
+def home():
+    return message
 
-@app.route('/set')
+@app.route('/set', methods=['GET'])
 def set_message():
-    global current_message
-    msg = request.args.get('message')
-    if msg:
-        current_message = msg
-        return f"Message updated to: {current_message}"
-    return "No message provided."
+    global message
+    new_message = request.args.get('message')
+    if new_message:
+        message = new_message
+        return f"Message set to: {message}"
+    return "No message provided", 400
