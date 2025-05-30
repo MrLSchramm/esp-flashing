@@ -1,17 +1,22 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify
+import os
 
 app = Flask(__name__)
-current_message = "Hello World!"
 
-@app.route('/')
-def get_message():
-    return current_message
+current_command = {"command": "off"}
 
-@app.route('/set')
-def set_message():
-    global current_message
-    msg = request.args.get('message')
-    if msg:
-        current_message = msg
-        return f"Message updated to: {current_message}"
-    return "No message provided."
+@app.route("/command", methods=["GET"])
+def get_command():
+    return jsonify(current_command)
+
+@app.route("/command", methods=["POST"])
+def set_command():
+    data = request.get_json()
+    if "command" in data:
+        current_command["command"] = data["command"]
+        return jsonify({"status": "ok", "command": current_command["command"]})
+    return jsonify({"status": "error", "message": "Missing 'command'"}), 400
+
+if __name__ == "__main__":
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
